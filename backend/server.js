@@ -9,7 +9,7 @@ var enforce = require('express-sslify');
 
 
 //APP USE
-app.use(enforce.HTTPS());
+app.use(enforce.HTTPS({ trustProtoHeader: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
