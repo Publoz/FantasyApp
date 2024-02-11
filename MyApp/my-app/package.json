@@ -1,0 +1,26 @@
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~50.0.6",
+    "expo-status-bar": "~1.11.1",
+    "react": "18.2.0",
+    "react-native": "0.73.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@react-native/js-polyfills": "^0.74.0",
+    "@react-native/metro-babel-transformer": "^0.73.15",
+    "@react-native/metro-config": "^0.73.5",
+    "metro-config": "^0.80.5",
+    "metro-runtime": "^0.80.5"
+  },
+  "private": true
+}
