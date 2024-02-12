@@ -1,17 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import ArticleList from './ArticleList';
+//import ArticleList from './ArticleList';
+import RootNavigation from './navigation/rootNav';
 
-
-var dec = ArticleList
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <ArticleList/>
-      <StatusBar style="auto" />
-    </View>
+    <RootNavigation/>
   );
 }
 
