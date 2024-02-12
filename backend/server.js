@@ -6,17 +6,41 @@ const port = 3000;
 var db = require("./database.js")
 var bodyParser = require('body-parser');
 var enforce = require('express-sslify');
+const session = require('express-session');
+require('dotenv').config()
+var SQLiteStore = require('connect-sqlite3')(session);
 
 
 //APP USE
-app.use(enforce.HTTPS({ trustProtoHeader: true }));
+//app.use(enforce.HTTPS({ trustProtoHeader: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(session({
+  store: new SQLiteStore(),
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
 
 
 //ROUTERS
 var authRouter = require('./routes/auth');
 app.use('/auth', authRouter);
+
+
+const requireAuth = (req, res, next) => {
+  if (req.session.userId) {
+      next(); // User is authenticated, continue to next middleware
+  } else {
+      return res.json({message: "Not authenticated"})
+      //res.redirect('/auth/login'); // User is not authenticated, redirect to login page
+  }
+}
+
+app.get('/dashboard', requireAuth, (req, res) => {
+  return res.json({message: "LoggedIn"})
+});
 
 
 

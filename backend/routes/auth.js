@@ -75,13 +75,20 @@ router.post('/login', (req, res, next) => {
                 res.status(400).json({"message": 'Invalid username or password'});
                 return; 
             }
-
+            req.session.userId = row.email;
             res.json({
                 message: "Found user w/ pass"
             })
         })
     });
 })
+
+router.get('/logout', async function(req, res, next) {
+    req.session.destroy(function(err) {
+        console.log('Destroyed session')
+     })
+     return res.json({message: "Logged out"})
+  });
 
 
 module.exports = router;
