@@ -6,7 +6,7 @@ import { Input } from '@rneui/base';
 
 const SignIn = ({ navigation }, props) => {
 
-    const auth = getAuth();
+    //const auth = getAuth();
 
     const [value, setValue] = useState({
         email: '',
@@ -24,7 +24,7 @@ const SignIn = ({ navigation }, props) => {
         }
       
         try {
-          await signInWithEmailAndPassword(auth, value.email, value.password);
+          //await signInWithEmailAndPassword(auth, value.email, value.password);
           navigation.navigate('SignIn');
         } catch (error) {
           setValue({

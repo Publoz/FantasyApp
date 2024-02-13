@@ -7,23 +7,24 @@ import { Input } from '@rneui/base';
 
 const SignUp = ({ navigation }, props) => {
 
-    const auth = getAuth();
+    //const auth = getAuth();
   
     const SignIn = () => {
         navigation.navigate("SignIn");
     }
 
     const [value, setValue] = useState({
+        name: '',
         email: '',
         password: '',
         error: ''
       })
 
     async function signUp() {
-        if (value.email === '' || value.password === '') {
+        if (value.email === '' || value.password === '' || value.name === '') {
           setValue({
             ...value,
-            error: 'Email and password are mandatory.'
+            error: 'All fields are mandatory.'
           })
           return;
         }
@@ -43,40 +44,44 @@ const SignUp = ({ navigation }, props) => {
         <View style={styles.container}>
 
            
-            <Text style={styles.title}>Sign Up page</Text>
+          <Text style={styles.title}>Sign Up page</Text>
 
-            <TouchableOpacity onPress={SignIn} style={styles.button}>
-                <Text style={styles.text}>Sign In Screen</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={SignIn} style={styles.button}>
+              <Text style={styles.text}>Sign In Screen</Text>
+          </TouchableOpacity>
 
 
-            {!!value.error && <View style={styles.error}><Text style={styles.error}>{value.error}</Text></View>}
+          {!!value.error && <View style={styles.error}><Text style={styles.error}>{value.error}</Text></View>}
 
-            <Input
+          <Input
+          placeholder='Name'
+          containerStyle={styles.input}
+          inputStyle={styles.text}
+          value={value.name}
+          onChangeText={(text) => setValue({ ...value, name: text })}
+          />
+
+          <Input
           placeholder='Email'
           containerStyle={styles.input}
           inputStyle={styles.text}
           value={value.email}
           onChangeText={(text) => setValue({ ...value, email: text })}
-          
-        />
+          />
 
-        {/* https://reactnativeelements.com/docs/3.4.2/input */}
-        <Input
+          {/* https://reactnativeelements.com/docs/3.4.2/input */}
+          <Input
           placeholder='Password'
           containerStyle={styles.input}
           inputStyle={styles.text}
           value={value.password}
           onChangeText={(text) => setValue({ ...value, password: text })}
           secureTextEntry={true}
-          
-        />
+          />
         
-
-        <TouchableOpacity title="Sign up" style={styles.button} onPress={signUp}>
-            <Text style={styles.buttonText}>Sign Up!</Text>
-        </TouchableOpacity>
-
+          <TouchableOpacity title="Sign up" style={styles.button} onPress={signUp}>
+              <Text style={styles.buttonText}>Sign Up!</Text>
+          </TouchableOpacity>
 
         </View>
     );

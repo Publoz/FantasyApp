@@ -30,10 +30,10 @@ app.use('/auth', authRouter);
 
 
 const requireAuth = (req, res, next) => {
-  if (req.session.userId) {
+  if (req.session.userId && req.session.verified && req.session.verified === '1') {
       next(); // User is authenticated, continue to next middleware
   } else {
-      return res.json({message: "Not authenticated"})
+      return res.json({message: "Not authenticated or not verified"})
       //res.redirect('/auth/login'); // User is not authenticated, redirect to login page
   }
 }
