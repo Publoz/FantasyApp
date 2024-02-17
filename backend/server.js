@@ -24,19 +24,36 @@ app.use(session({
 }));
 
 
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', process.env.PRODURL);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 //ROUTERS
 var authRouter = require('./routes/auth');
 app.use('/auth', authRouter);
 
 
 const requireAuth = (req, res, next) => {
-  if (req.session.userId && req.session.verified && req.session.verified === '1') {
-      next(); // User is authenticated, continue to next middleware
-  } else {
-      return res.json({message: "Not authenticated or not verified"})
-      //res.redirect('/auth/login'); // User is not authenticated, redirect to login page
+  var message = "";
+  if (!req.session.userId) {
+      message += "No user Id - ";
+  } 
+  if(!req.session.verified){
+    message += " verified no exists -";
   }
+  if(req.session.verified !== 1){
+    message += " Not 1 - " + req.session.verified;
+  }
+  if(message !== ''){
+    return res.json({message: message})
+  }
+  
+  next();
 }
+
 
 app.get('/dashboard', requireAuth, (req, res) => {
   return res.json({message: "LoggedIn"})

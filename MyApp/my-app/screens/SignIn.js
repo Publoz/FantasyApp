@@ -34,13 +34,15 @@ const SignIn = ({ navigation }, props) => {
     await axios.post(process.env.BACKEND + '/auth/login', {
       email: value.email,
       password: value.password
-    }, {
+    }, 
+    {withCredentials: true},
+    {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         "Accept": "*/*, application/json, text/plain"
       }
     }).then(function (response) {
-      if(response.status = 404){
+      if(!response.data.message || response.data.error){
         setValue({
           ...value,
           error: "Username/password wrong",
@@ -50,8 +52,8 @@ const SignIn = ({ navigation }, props) => {
         console.log(response);
         return;
       } else {
-        axios.get(process.env.BACKEND + '/dashboard').then(response => {
-          console.log(response.message);
+        axios.get(process.env.BACKEND + '/dashboard', {withCredentials: true}).then(response => {
+          console.log(response.data.message);
       })
       .catch(error => {
           console.log(error);
