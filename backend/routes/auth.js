@@ -2,15 +2,17 @@ var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
 var db = require("../database.js")
-var nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRIDKEY);
+//var nodemailer = require('nodemailer');
 
-var transporter = nodemailer.createTransport({
-    service: 'hotmail',
-    auth: {
-      user: process.env.APPEMAIL,
-      pass: process.env.EMAILPASSWORD
-    }
-  });
+// var transporter = nodemailer.createTransport({
+//     service: 'hotmail',
+//     auth: {
+//       user: process.env.APPEMAIL,
+//       pass: process.env.EMAILPASSWORD
+//     }
+//   });
   
 
 //SQL
@@ -58,20 +60,36 @@ function handleSuccessfulSignUp(res, email, userId){
 
     var link = process.env.PRODURL + '/auth/verify?token=' + randomString;
     var mailOptions = {
-        from: process.env.APPEMAIL,
+        from: {
+            email: process.env.APPEMAIL,
+            name: 'Handball Fantasy League'
+        },
         to: email,
         subject: 'Welcome to Handball Fantasy League',
         text: 'Kia Ora, \n\nThank you for joining us in the Handball Fantasy League!\nPlease click the'
-         + ' link to verify your account ' + link +'\n\nCheers, PI20'
+         + ' link to verify your account ' + link +'\n\nCheers, PI20',
+        trackingSettings: {
+            clickTracking: {
+                enable: false,
+                enableText: false
+            },
+            openTracking: {
+                enable: false
+            }
+        }
       };
 
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log('Error sending: ' + error);
-        } else {
-          console.log('Email sent: ' + info.response);
+      (async () => {
+        try {
+          await sgMail.send(mailOptions);
+        } catch (error) {
+          console.error(error);
+      
+          if (error.response) {
+            console.error(error.response.body)
+          }
         }
-      });
+      })();
 }
 
 
@@ -167,6 +185,8 @@ router.post('/login', (req, res, next) => {
             }
             req.session.userId = row.email;
             req.session.verified = row.verified;
+            res.statusCode = 200;
+            res.statusMessage = "Found";
             res.json({
                 message: "Found user w/ pass"
             })

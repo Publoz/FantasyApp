@@ -1,133 +1,165 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Input } from '@rneui/base';
+import axios from 'axios';
 
 
 
 const SignIn = ({ navigation }, props) => {
 
-    //const auth = getAuth();
+  //const auth = getAuth();
 
-    const [value, setValue] = useState({
-        email: '',
-        password: '',
-        error: ''
+  const [value, setValue] = useState({
+    email: '',
+    password: '',
+    error: ''
+  })
+
+  function verifyInput() {
+    if (value.email === '' || value.password === '') {
+      setValue({
+        ...value,
+        error: 'All fields are mandatory.'
       })
+      return false;
+    }
+    return true;
+  }
 
-    async function signIn() {
-        if (value.email === '' || value.password === '') {
-          setValue({
-            ...value,
-            error: 'Email and password are mandatory.'
-          })
-          return;
-        }
-      
-        try {
-          //await signInWithEmailAndPassword(auth, value.email, value.password);
-          navigation.navigate('SignIn');
-        } catch (error) {
-          setValue({
-            ...value,
-            error: error.message,
-          })
-        }
-      }
-  
-    const Welcome = () => {
-        navigation.navigate("Welcome");
+  async function signIn() {
+    if (!verifyInput()) {
+      return;
     }
 
-    return (
-        <View style={styles.container}>
+    await axios.post(process.env.BACKEND + '/auth/login', {
+      email: value.email,
+      password: value.password
+    }, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        "Accept": "*/*, application/json, text/plain"
+      }
+    }).then(function (response) {
+      if(response.status = 404){
+        setValue({
+          ...value,
+          error: "Username/password wrong",
+        })
+        console.log('-----')
+        console.log(response.data.message);
+        console.log(response);
+        return;
+      } else {
+        axios.get(process.env.BACKEND + '/dashboard').then(response => {
+          console.log(response.message);
+      })
+      .catch(error => {
+          console.log(error);
+      });
 
-           
-        <Text style={styles.title}>Sign In page</Text>
+      }
+    }).catch(function (error) {
+      setValue({
+        ...value,
+        error: error.message,
+      })
+    });
+  }
 
-        <TouchableOpacity onPress={Welcome} style={styles.button}>
-            <Text style={styles.text}>To Welcome Screen</Text>
-        </TouchableOpacity>
+  const Welcome = () => {
+    navigation.navigate("Welcome");
+  }
+
+  return (
+    <View style={styles.container}>
 
 
-        {!!value.error && <View style={styles.error}><Text style={styles.error}>{value.error}</Text></View>}
+      <Text style={styles.title}>Sign In page</Text>
 
-        <Input
-      placeholder='Email'
-      containerStyle={styles.input}
-      inputStyle={styles.text}
-      value={value.email}
-      onChangeText={(text) => setValue({ ...value, email: text })}
-      
-    />
+      <TouchableOpacity onPress={Welcome} style={styles.button}>
+        <Text style={styles.text}>To Welcome Screen</Text>
+      </TouchableOpacity>
 
-    {/* https://reactnativeelements.com/docs/3.4.2/input */}
-    <Input
-      placeholder='Password'
-      containerStyle={styles.input}
-      inputStyle={styles.text}
-      value={value.password}
-      onChangeText={(text) => setValue({ ...value, password: text })}
-      secureTextEntry={true}
-      
-    />
-    
 
-    <TouchableOpacity title="Sign up" style={styles.button} onPress={signIn}>
+      {!!value.error && <View style={styles.error}><Text style={styles.error}>{value.error}</Text></View>}
+
+      <Input
+        placeholder='Email'
+        containerStyle={styles.input}
+        inputStyle={styles.text}
+        value={value.email}
+        onChangeText={(text) => setValue({ ...value, email: text })}
+
+      />
+
+      {/* https://reactnativeelements.com/docs/3.4.2/input */}
+      <Input
+        placeholder='Password'
+        containerStyle={styles.input}
+        inputStyle={styles.text}
+        value={value.password}
+        onChangeText={(text) => setValue({ ...value, password: text })}
+        secureTextEntry={true}
+
+      />
+
+
+      <TouchableOpacity title="Sign up" style={styles.button} onPress={signIn}>
         <Text style={styles.buttonText}>Sign In</Text>
-    </TouchableOpacity>
+      </TouchableOpacity>
 
 
     </View>
-    );
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingTop: 20,
-      backgroundColor: '#777777',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  
-    button: {
-        backgroundColor: '#5e3bf6',
-        padding: 10,
-        borderWidth: 2,
-        borderColor: 'white',
-        margin: 20
-    },
+  container: {
+    flex: 1,
+    paddingTop: 20,
+    backgroundColor: '#777777',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
-    input: {
-        width: '50%',
-        alignItems: 'center',
-    },
-    
-    buttonText: {
-        color: 'white', 
-        fontSize: 30
-    },
-  
-    title: {
-        color: 'white', 
-        fontSize: 30,
-        textDecorationLine: 'underline'
- 
-    },
+  button: {
+    backgroundColor: '#5e3bf6',
+    padding: 10,
+    borderWidth: 2,
+    borderColor: 'white',
+    margin: 20
+  },
 
-    text: {
-        color: 'white', 
-        fontSize: 30,
-        
-    },
+  input: {
+    width: '50%',
+    alignItems: 'center',
+  },
 
-    error: {
-        color: 'red',
-        backgroundColor: 'black',
-        fontSize: 30,
-        padding: 5
-    }
-   
-  });
+  buttonText: {
+    color: 'white',
+    fontSize: 30
+  },
+
+  title: {
+    color: 'white',
+    fontSize: 30,
+    textDecorationLine: 'underline'
+
+  },
+
+  text: {
+    color: 'white',
+    fontSize: 30,
+
+  },
+
+  error: {
+    color: 'red',
+    backgroundColor: 'black',
+    fontSize: 30,
+    padding: 5
+  }
+
+});
 
 export default SignIn;
