@@ -12,7 +12,10 @@ var SQLiteStore = require('connect-sqlite3')(session);
 
 
 //APP USE
-//app.use(enforce.HTTPS({ trustProtoHeader: true }));
+if(process.env.ISPROD + '' === '1'){
+  app.use(enforce.HTTPS({ trustProtoHeader: true }));
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(session({
@@ -20,7 +23,7 @@ app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: { secure: (process.env.ISPROD + '' === '1') }
 }));
 
 
