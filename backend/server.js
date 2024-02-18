@@ -13,7 +13,7 @@ var SQLiteStore = require('connect-sqlite3')(session);
 
 //APP USE
 if(process.env.ISPROD + '' === '1'){
-  app.use(enforce.HTTPS({ trustProtoHeader: true }));
+  app.use(enforce.HTTPS());
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));

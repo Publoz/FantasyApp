@@ -52,6 +52,7 @@ const SignIn = ({ navigation }, props) => {
         console.log(response);
         return;
       } else {
+        console.log(response);
         axios.get(process.env.BACKEND + '/dashboard', {withCredentials: true}).then(response => {
           console.log(response.data.message);
       })
