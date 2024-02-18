@@ -4,6 +4,7 @@ var crypto = require('crypto');
 var db = require("../database.js")
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRIDKEY);
+const jwt = require('jsonwebtoken');
 //var nodemailer = require('nodemailer');
 
 // var transporter = nodemailer.createTransport({
@@ -183,21 +184,32 @@ router.post('/login', (req, res, next) => {
                 res.status(400).json({"message": 'Invalid username or password'});
                 return; 
             }
-            req.session.userId = row.email;
-            req.session.verified = row.verified;
             res.statusCode = 200;
             res.statusMessage = "Found";
             res.json({
-                message: "Found user w/ pass"
+                message: "Found user w/ pass",
+                token: generateToken(row.email)
             })
         })
     });
 })
 
+
+function generateToken(email){
+    let jwtSecretKey = process.env.SECRET;
+    let data = {
+        user: email
+    };
+ 
+    const token = jwt.sign(data, jwtSecretKey);
+
+    return token;
+}
+
+
 router.get('/logout', async function(req, res, next) {
-    req.session.destroy(function(err) {
-        console.log('Destroyed session')
-     })
+    
+
      return res.json({message: "Logged out"})
   });
 

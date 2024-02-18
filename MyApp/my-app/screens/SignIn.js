@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Input } from '@rneui/base';
 import axios from 'axios';
-
-
+import fetchClient from '../utils/apiCaller';
+import { setToken } from '../redux/store';
 
 const SignIn = ({ navigation }, props) => {
 
@@ -14,6 +14,7 @@ const SignIn = ({ navigation }, props) => {
     password: '',
     error: ''
   })
+  
 
   function verifyInput() {
     if (value.email === '' || value.password === '') {
@@ -31,15 +32,13 @@ const SignIn = ({ navigation }, props) => {
       return;
     }
 
-    await axios.post(process.env.BACKEND + '/auth/login', {
+    await fetchClient().post('/auth/login', {
       email: value.email,
       password: value.password
-    }, 
-    {withCredentials: true},
+    },
     {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        "Accept": "*/*, application/json, text/plain"
+        'Content-Type': 'application/x-www-form-urlencoded'
       }
     }).then(function (response) {
       if(!response.data.message || response.data.error){
@@ -52,8 +51,11 @@ const SignIn = ({ navigation }, props) => {
         console.log(response);
         return;
       } else {
-        //console.log(response);
-        axios.get(process.env.BACKEND + '/dashboard', {withCredentials: true}).then(response => {
+        console.log('-----VALID----');
+        console.log(response.data.token);
+        store.dispatch(setToken(response.data.token));
+
+        fetchClient().get(process.env.BACKEND + '/dashboard').then(response => {
           console.log(response.data.message);
       })
       .catch(error => {
