@@ -5,16 +5,11 @@ const port = 3000;
 //MODULES
 var db = require("./database.js")
 var bodyParser = require('body-parser');
-var enforce = require('express-sslify');
+//var enforce = require('express-sslify');
 const session = require('express-session');
 require('dotenv').config()
 var SQLiteStore = require('connect-sqlite3')(session);
 
-
-//APP USE
-if(process.env.ISPROD + '' === '1'){
-  app.use(enforce.HTTPS());
-}
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

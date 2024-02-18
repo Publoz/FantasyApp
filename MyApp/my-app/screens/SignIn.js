@@ -52,19 +52,19 @@ const SignIn = ({ navigation }, props) => {
         console.log(response);
         return;
       } else {
-        console.log(response);
+        //console.log(response);
         axios.get(process.env.BACKEND + '/dashboard', {withCredentials: true}).then(response => {
           console.log(response.data.message);
       })
       .catch(error => {
-          console.log(error);
+          console.log(error.message);
       });
 
       }
     }).catch(function (error) {
       setValue({
         ...value,
-        error: error,
+        error: error.message,
       })
     });
   }
