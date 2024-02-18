@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { store } from '../redux/store';
+import { Store } from '../redux/store';
 
 const fetchClient = () => {
 
@@ -12,9 +12,10 @@ const fetchClient = () => {
   const instance = axios.create(defaultOptions);
 
   instance.interceptors.request.use(function (config) {
-    var token = store.getState("token")
+    var token = Store.getState()
+    console.log("API Caller - token below")
     console.log(token);
-    config.headers.TokenAuth =  token ? token : '';
+    config.headers.TokenAuth =  token.value;
     return config;
   });
 

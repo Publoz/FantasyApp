@@ -4,6 +4,8 @@ import { Input } from '@rneui/base';
 import axios from 'axios';
 import fetchClient from '../utils/apiCaller';
 import { setToken } from '../redux/store';
+import { Store } from '../redux/store';
+import { useDispatch } from 'react-redux';
 
 const SignIn = ({ navigation }, props) => {
 
@@ -15,6 +17,7 @@ const SignIn = ({ navigation }, props) => {
     error: ''
   })
   
+  const dispatch = useDispatch();
 
   function verifyInput() {
     if (value.email === '' || value.password === '') {
@@ -32,7 +35,7 @@ const SignIn = ({ navigation }, props) => {
       return;
     }
 
-    await fetchClient().post('/auth/login', {
+    await fetchClient.post('/auth/login', {
       email: value.email,
       password: value.password
     },
@@ -53,9 +56,9 @@ const SignIn = ({ navigation }, props) => {
       } else {
         console.log('-----VALID----');
         console.log(response.data.token);
-        store.dispatch(setToken(response.data.token));
+        dispatch(setToken(response.data.token));
 
-        fetchClient().get(process.env.BACKEND + '/dashboard').then(response => {
+        fetchClient.get('/dashboard').then(response => {
           console.log(response.data.message);
       })
       .catch(error => {
