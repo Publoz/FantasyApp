@@ -63,7 +63,7 @@ const SignIn = ({ navigation }, props) => {
     }).catch(function (error) {
       setValue({
         ...value,
-        error: error.message,
+        error: error,
       })
     });
   }
