@@ -10,11 +10,9 @@ const fetchClient = () => {
     },
   };
   const instance = axios.create(defaultOptions);
-
+  console.log(process.env.BACKEND);
   instance.interceptors.request.use(function (config) {
     var token = Store.getState()
-    console.log("API Caller - token below")
-    console.log(token);
     config.headers.TokenAuth =  token.value;
     return config;
   });

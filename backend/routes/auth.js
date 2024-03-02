@@ -173,8 +173,8 @@ router.post('/login', (req, res, next) => {
             res.status(404).json({"message":"User Not found"});
             return;
         }
-        console.log("Found: ");
-        console.log(row);
+        console.log("Found User: ");
+        console.log(row.email);
 
         crypto.pbkdf2(req.body.password, row.salt, 310000, 32, 'sha256', async function(err, hashedPass){
             if(err){

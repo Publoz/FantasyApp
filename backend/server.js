@@ -33,11 +33,18 @@ const requireAuth = (req, res, next) => {
   try {
     const token = req.header(tokenHeaderKey);
 
-    const verified = jwt.verify(token, jwtSecretKey);
-    if (verified) {
+    var verified = jwt.verify(token, jwtSecretKey, function(err, decoded){
+
+      if(err) {
+        return res.status(401).send(err);
+      }
+      req.user = decoded.user;
+      return true;
+    });
+  
+    if(verified) {
       next();
     } else {
-      // Access Denied
       return res.status(401).send(error);
     }
   } catch (error) {
