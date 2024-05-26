@@ -3,9 +3,9 @@ const app = express();
 const port = 3000;
 
 //MODULES
+require('dotenv').config()
 var db = require("./database.js")
 var bodyParser = require('body-parser');
-require('dotenv').config()
 const jwt = require('jsonwebtoken');
 
 

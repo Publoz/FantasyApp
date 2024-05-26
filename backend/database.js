@@ -1,8 +1,6 @@
 var sqlite3 = require('sqlite3').verbose()
 
-const DBSOURCE = "db.sqlite"
-
-let db = new sqlite3.Database(DBSOURCE, (err) => {
+let db = new sqlite3.Database(process.env.DBPATH, (err) => {
     if (err) {
       // Cannot open database
       console.error(err.message)
