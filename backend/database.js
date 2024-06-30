@@ -6,12 +6,13 @@ const { Pool } = postgresql;
 
 export default (callback = null) => {
     const pool = new Pool({
-        host: process.env.DBHOST,
+       /* host: process.env.DBHOST,
         user: process.env.DBUSER,
         port: process.env.DBPORT,
         password: process.env.DBPASSWORD,
         database: process.env.DBDATABASE,
-        ssl: true
+        ssl: true*/
+        connectionString: `postgresql://${process.env.DBUSER}:${process.env.DBPASSWORD}@${process.env.DBHOST}/${process.env.DBDATABASE}?sslmode=require`
     })
 
     const connection = {
