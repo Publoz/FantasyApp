@@ -1,10 +1,10 @@
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-var crypto = require('crypto');
-var db = require("../database.js")
-const sgMail = require('@sendgrid/mail');
+import crypto from 'crypto';
+import db from "../database.js";
+import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(process.env.SENDGRIDKEY);
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 //var nodemailer = require('nodemailer');
 
 // var transporter = nodemailer.createTransport({
@@ -17,12 +17,12 @@ const jwt = require('jsonwebtoken');
   
 
 //SQL
-const signUpSql = 'INSERT INTO Users (name, email, password, salt) VALUES (?,?,?,?)'
-const loginSql = 'SELECT * FROM Users WHERE email = ? LIMIT 1'
-const insertTokenSql = 'INSERT INTO Tokens (userId, value) VALUES (?,?)'
-const findTokenSql = 'SELECT * FROM Tokens WHERE Value = ?'
-const verifyUserSql = 'UPDATE Users SET verified = 1 WHERE id = ?'
-const updateTokenSql = 'UPDATE Tokens SET isRedeemed = 1 WHERE userid = ?'
+const signUpSql = 'INSERT INTO Users (name, email, password, salt) VALUES ($1,$2,$3,$4) RETURNING UserId'
+const loginSql = 'SELECT * FROM Users WHERE email = $1 LIMIT 1'
+const insertTokenSql = 'INSERT INTO Tokens (UserId, Value) VALUES ($1,$2)'
+const findTokenSql = 'SELECT * FROM Tokens WHERE Value = $1'
+const verifyUserSql = 'UPDATE Users SET verified = 1 WHERE id = $1'
+const updateTokenSql = 'UPDATE Tokens SET isRedeemed = 1 WHERE userid = $1'
 
 function validateSignUpDetails(req){
     if(!req.body.password || req.body.password.length <= 6){
@@ -48,16 +48,17 @@ function isEmail(email) {
 //Now we have email and user id we need to send verify email
 //STEPS gen random string and save in tokens, send email with link
 //user will click link and be verified
-function handleSuccessfulSignUp(res, email, userId){
+async function handleSuccessfulSignUp(res, email, userId){
     const randomString = crypto.randomBytes(32).toString("hex");
 
     var params = [userId, randomString];
-    db.run(insertTokenSql, params, function(err, result){
-        if (err){
-            console.log('Error inserting token: ' + err);
-            return;
-        }
-    });
+
+    try {
+        await process.postgresql.query(insertTokenSql, params);
+    } catch(err){
+        console.log('Error inserting token: ' + err);
+        return;
+    }
 
     var link = process.env.PRODURL + '/auth/verify?token=' + randomString;
     var mailOptions = {
@@ -107,17 +108,17 @@ router.post('/signup', (req, res, next) => {
         }
         
         var params = [req.body.name, req.body.email, hashedPass, salt];
-        db.run(signUpSql, params, function(err, result){
-            if (err){
-                res.status(400).json({"error": err.message})
-                return;
-            }
-            var userId = this.lastID;
+        try {
+            const userId = (await process.postgresql.query(signUpSql, params)).rows[0]['userid'];
             handleSuccessfulSignUp(res, req.body.email, userId);
             res.json({
                 "message" : userId
             })
-        });
+    
+        } catch (err){
+            res.status(400).json({"error": err.message})
+            return;
+        }
     });
 })
 
@@ -214,4 +215,4 @@ router.get('/logout', async function(req, res, next) {
   });
 
 
-module.exports = router;
+export default router;

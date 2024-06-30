@@ -1,14 +1,18 @@
-const express = require('express');
-const app = express();
+import express from 'express';
 const port = 3000;
 
-//MODULES
-require('dotenv').config()
-var db = require("./database.js")
-var bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+import 'dotenv/config'
+// dotenv from 'dotenv';
+//dotenv.config();
+import postgresql from './database.js'
+import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
 
+postgresql(async (connection) => {
+  console.log("Chur");
+});
 
+const app = express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -22,7 +26,8 @@ app.use(bodyParser.json());
 // });
 
 //ROUTERS
-var authRouter = require('./routes/auth');
+//var authRouter = require('./routes/auth');
+import authRouter from './routes/auth.js'
 app.use('/auth', authRouter);
 
 
@@ -53,8 +58,26 @@ const requireAuth = (req, res, next) => {
   }
 }
 
+app.get('/testdb', async (req, res) => {
+  const result = await process.postgresql.query(`Select * FROM Test`)
+  console.log(result.rows);
+
+
+  return res.json({ message: "Chur" });
+
+});
 
 app.get('/dashboard', requireAuth, (req, res) => {
+
+  db.query(`Select * FROM Test`, (e, r)=> {
+    if(!error){
+        console.log(r.rows);
+    } else {
+        console.log(e.message);
+    }
+    client.end;
+  });
+
   return res.json({ message: "LoggedIn" })
 });
 
