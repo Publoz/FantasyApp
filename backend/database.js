@@ -12,6 +12,9 @@ export default (callback = null) => {
         password: process.env.DBPASSWORD,
         database: process.env.DBDATABASE,
         ssl: true*/
+        ssl: {
+          rejectUnauthorized: false  // This disables SSL certificate validation
+        },      
         connectionString: `postgresql://${process.env.DBUSER}:${process.env.DBPASSWORD}@${process.env.DBHOST}/${process.env.DBDATABASE}?sslmode=require`
     })
 

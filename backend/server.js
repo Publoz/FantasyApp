@@ -59,7 +59,8 @@ const requireAuth = (req, res, next) => {
 }
 
 app.get('/testdb', async (req, res) => {
-  const result = await process.postgresql.query(`Select * FROM Test`)
+  console.log("Received test");
+  const result = await process.postgresql.query(`Select * FROM Test`);
   console.log(result.rows);
 
 
