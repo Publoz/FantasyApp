@@ -38,11 +38,6 @@ const SignIn = ({ navigation }, props) => {
     await fetchClient.post('/auth/login', {
       email: value.email,
       password: value.password
-    },
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
     }).then(function (response) {
       if(!response.data.message || response.data.error){
         setValue({

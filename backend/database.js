@@ -1,51 +1,36 @@
-//const { Pool } = require('pg');
 import postgresql from 'pg';
 
 const { Pool } = postgresql;
 
-
-export default (callback = null) => {
+const createDatabaseConnection = (callback = null) => {
     const pool = new Pool({
-       /* host: process.env.DBHOST,
-        user: process.env.DBUSER,
-        port: process.env.DBPORT,
-        password: process.env.DBPASSWORD,
-        database: process.env.DBDATABASE,
-        ssl: true*/
         ssl: {
           rejectUnauthorized: false  // This disables SSL certificate validation
         },      
         connectionString: `postgresql://${process.env.DBUSER}:${process.env.DBPASSWORD}@${process.env.DBHOST}/${process.env.DBDATABASE}?sslmode=require`
-    })
+    });
 
     const connection = {
         pool,
-        query: (...args) => {
-          return pool.connect().then((client) => {
-            return client.query(...args).then((res) => {
-              client.release();
-              return res;
-            });
-          });
+        query: async (...args) => {
+          const client = await pool.connect();
+          try {
+            const res = await client.query(...args);
+            return res;
+          } catch (err) {
+            console.error('Query error', err);
+            throw err;
+          } finally {
+            client.release();
+          }
         },
-      };
-    
-      process.postgresql = connection;
-    
-      if (callback) {
+    };
+
+    if (callback) {
         callback(connection);
-      }
-    
-      return connection;
+    }
 
-    /*client.query(`Select * FROM Test`, (error, res)=> {
-        if(!error){
-            console.log(res.rows);
-        } else {
-            console.log(error.message);
-        }
-        client.end;
-    }) */
-
-    //module.exports = pool
+    return connection;
 };
+
+export default createDatabaseConnection;
