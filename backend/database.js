@@ -2,13 +2,18 @@ import postgresql from 'pg';
 
 const { Pool } = postgresql;
 
+let pool;
+
 const createDatabaseConnection = (callback = null) => {
-    const pool = new Pool({
+  if (!pool) {
+    pool = new Pool({
         ssl: {
-          rejectUnauthorized: false  // This disables SSL certificate validation
-        },      
+            rejectUnauthorized: false  // This disables SSL certificate validation
+        },
         connectionString: `postgresql://${process.env.DBUSER}:${process.env.DBPASSWORD}@${process.env.DBHOST}/${process.env.DBDATABASE}?sslmode=require`
     });
+  }
+
 
     const connection = {
         pool,

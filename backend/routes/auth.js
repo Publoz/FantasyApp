@@ -1,21 +1,13 @@
 import express from 'express';
 var router = express.Router();
 import crypto from 'crypto';
-import db from "../database.js";
+import createDatabaseConnection from "../database.js";
 import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(process.env.SENDGRIDKEY);
 import jwt from 'jsonwebtoken';
-import app from '../server.js';
-//var nodemailer = require('nodemailer');
 
-// var transporter = nodemailer.createTransport({
-//     service: 'hotmail',
-//     auth: {
-//       user: process.env.APPEMAIL,
-//       pass: process.env.EMAILPASSWORD
-//     }
-//   });
-  
+
+const db = createDatabaseConnection();
 
 //SQL
 const signUpSql = 'INSERT INTO Users (name, email, password, salt) VALUES ($1,$2,$3,$4) RETURNING UserId'
@@ -35,7 +27,7 @@ function validateSignUpDetails(req){
     if(!req.body.email || !isEmail(req.body.email)){
         return 'Enter Valid Email';
     }
-    return '';
+    return null;
 }
 
 function isEmail(email) {
@@ -55,7 +47,7 @@ async function handleSuccessfulSignUp(res, email, userId){
     var params = [userId, randomString];
 
     try {
-        await process.postgresql.query(insertTokenSql, params);
+        await db.query(insertTokenSql, params);
     } catch(err){
         console.log('Error inserting token: ' + err);
         return;
@@ -69,8 +61,8 @@ async function handleSuccessfulSignUp(res, email, userId){
         },
         to: email,
         subject: 'Welcome to Handball Fantasy League',
-        text: 'Kia Ora, \n\nThank you for joining us in the Handball Fantasy League!\nPlease click the'
-         + ' link to verify your account ' + link +'\n\nCheers, PI20',
+        text: 'Kia Ora, \n\nThank you for joining us in the Handball Fantasy League!\n\nPlease click the'
+         + ' link to verify your account\n\n' + link +'\n\nCheers, PI20',
         trackingSettings: {
             clickTracking: {
                 enable: false,
@@ -98,7 +90,7 @@ async function handleSuccessfulSignUp(res, email, userId){
 
 router.post('/signup', (req, res, next) => {
     let msg = validateSignUpDetails(req);
-    if(msg != ''){
+    if(msg !== null){
         return res.status(400).send(msg);
     }
 
@@ -110,7 +102,7 @@ router.post('/signup', (req, res, next) => {
         
         var params = [req.body.name, req.body.email, hashedPass, salt];
         try {
-            const userId = (await process.postgresql.query(signUpSql, params)).rows[0]['userid'];
+            const userId = (await db.query(signUpSql, params)).rows[0]['userid'];
             handleSuccessfulSignUp(res, req.body.email, userId);
             res.json({
                 "message" : userId
@@ -129,7 +121,7 @@ router.post('/signup', (req, res, next) => {
     }
     var params = [req.query.token];
     try {
-        const token = (await process.postgresql.query(findTokenSql, params)).rows[0]
+        const token = (await db.query(findTokenSql, params)).rows[0]
         
         if(!token){
             res.status(404).json({"error":'No token found, trash'});
@@ -143,11 +135,9 @@ router.post('/signup', (req, res, next) => {
 
         var params = [token.userid];
 
-        Promise.all([process.postgresql.query(updateTokenSql, params), process.postgresql.query(verifyUserSql, params)
+        Promise.all([db.query(updateTokenSql, params), db.query(verifyUserSql, params)
         ]).then(function([query1Results, query2Results]){
             console.log("Success updating tokens");
-            req.url = '/dashboard'
-            return app._router.handle(req, res, next)
             res.json({message: "User verified! (yeah I couldn't be bothered doing this page)."})
         }).catch(function(e){
             console.log("err " + e);
@@ -161,37 +151,38 @@ router.post('/signup', (req, res, next) => {
     }
 })
 
-router.post('/login', (req, res, next) => {
+router.post('/login', async (req, res, next) => {
     var params = [req.body.email];
-    db.get(loginSql, params, (err, row) => {
-        if (err){
-            res.status(400).json({"error":err.message});
-            return;
+    try {
+        const result = await db.query(loginSql, params);
+        const row = result.rows[0];
+    
+        if (!row) {
+          return res.status(404).json({ "message": "User Not found" });
         }
-        if(!row){
-            res.status(404).json({"message":"User Not found"});
-            return;
-        }
+    
         console.log("Found User: ");
         console.log(row.email);
-
-        crypto.pbkdf2(req.body.password, row.salt, 310000, 32, 'sha256', async function(err, hashedPass){
-            if(err){
-                return res.status(500).send('Password gen failed');
-            }
-            if(!crypto.timingSafeEqual(row.password, hashedPass)){
-                res.status(400).json({"message": 'Invalid username or password'});
-                return; 
-            }
-            res.statusCode = 200;
-            res.statusMessage = "Found";
-            res.json({
-                message: "Found user w/ pass",
-                token: generateToken(row.email)
-            })
-        })
-    });
-})
+    
+        crypto.pbkdf2(req.body.password, row.salt, 310000, 32, 'sha256', (err, hashedPass) => {
+          if (err) {
+            return res.status(500).send('Password gen failed');
+          }
+          if (!crypto.timingSafeEqual(row.password, hashedPass)) {
+            return res.status(400).json({ "message": 'Invalid username or password' });
+          }
+    
+          res.status(200).json({
+            message: "Found user w/ pass",
+            token: generateToken(row.email)
+          });
+        });
+      } catch (err) {
+        console.error('Database query error', err);
+        res.status(500).json({ "error": err.message });
+      }
+});
+    
 
 
 function generateToken(email){
@@ -206,9 +197,8 @@ function generateToken(email){
 }
 
 
+// TODO: Do we need this?
 router.get('/logout', async function(req, res, next) {
-    
-
      return res.json({message: "Logged out"})
   });
 

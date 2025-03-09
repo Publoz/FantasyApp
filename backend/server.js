@@ -55,6 +55,21 @@ app.get('/testdb', async (req, res) => {
   }
 });
 
+app.get('/dashboard', requireAuth, (req, res) => {
+
+  db.query(`Select * FROM Test`, (e, r)=> {
+    if(!e){
+        console.log(r.rows);
+    } else {
+        console.log(e.message);
+    }
+  });
+
+  //TODO: May need to be inside callback function
+  return res.json({ message: "LoggedIn" })
+});
+
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
