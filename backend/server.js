@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken';
 import createDatabaseConnection from './database.js';
 import authRouter from './routes/auth.js';
+import requireAuth from './middlewares/requireAuth.js';
 
 const app = express();
 
@@ -21,24 +21,7 @@ app.use(bodyParser.json());
 // Use auth router
 app.use('/auth', authRouter);
 
-const requireAuth = (req, res, next) => {
-  let tokenHeaderKey = process.env.TOKENHEADER;
-  let jwtSecretKey = process.env.SECRET;
 
-  try {
-    const token = req.header(tokenHeaderKey);
-
-    jwt.verify(token, jwtSecretKey, (err, decoded) => {
-      if (err) {
-        return res.status(401).send(err);
-      }
-      req.user = decoded.user;
-      next();
-    });
-  } catch (error) {
-    return res.status(401).send(error);
-  }
-};
 
 // Create database connection
 const db = createDatabaseConnection();
@@ -69,11 +52,5 @@ app.get('/dashboard', requireAuth, (req, res) => {
   return res.json({ message: "LoggedIn" })
 });
 
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 export default app;

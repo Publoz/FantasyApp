@@ -5,8 +5,16 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node startServer.js",
+    "test": "npx jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "testMatch": [
+      "**/tests/*.test.js"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -24,7 +32,12 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.9",
+    "@babel/preset-env": "^7.26.9",
     "@types/body-parser": "^1.19.5",
-    "@types/express-sslify": "^1.2.5"
+    "@types/express-sslify": "^1.2.5",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
