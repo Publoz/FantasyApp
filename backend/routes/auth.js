@@ -158,7 +158,7 @@ router.post('/login', async (req, res, next) => {
         const row = result.rows[0];
     
         if (!row) {
-          return res.status(404).json({ "message": "User Not found" });
+          return res.status(401).json({ "message": "Invalid username or password" });
         }
     
         console.log("Found User: ");
@@ -169,7 +169,7 @@ router.post('/login', async (req, res, next) => {
             return res.status(500).send('Password gen failed');
           }
           if (!crypto.timingSafeEqual(row.password, hashedPass)) {
-            return res.status(400).json({ "message": 'Invalid username or password' });
+            return res.status(401).json({ "message": 'Invalid username or password' });
           }
     
           res.status(200).json({

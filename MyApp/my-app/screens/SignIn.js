@@ -16,7 +16,9 @@ const SignIn = ({ navigation }, props) => {
     password: '',
     error: ''
   })
-  
+
+  const [loading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
 
   function verifyInput() {
@@ -35,11 +37,23 @@ const SignIn = ({ navigation }, props) => {
       return;
     }
 
-    await fetchClient.post('/auth/login', {
-      email: value.email,
-      password: value.password
-    }).then(function (response) {
-      if(!response.data.message || response.data.error){
+    setLoading(true);
+    setValue({
+      ...value,
+      error: ''
+    })
+
+    try {
+      const response = await fetchClient.post('/auth/login', {
+        email: value.email,
+        password: value.password
+      }, {
+        validateStatus: function (status) {
+          return status >= 200 && status < 500; // Resolve only if the status code is less than 500
+        }
+      });
+
+      if (!response.data.message || response.data.error || response.status != 200) {
         setValue({
           ...value,
           error: "Username/password wrong",
@@ -55,18 +69,20 @@ const SignIn = ({ navigation }, props) => {
 
         fetchClient.get('/dashboard').then(response => {
           console.log(response.data.message);
-      })
-      .catch(error => {
-          console.log(error.message);
-      });
-
+        })
+          .catch(error => {
+            console.log(error.message);
+          });
       }
-    }).catch(function (error) {
+
+    } catch (error) {
       setValue({
         ...value,
         error: error.message,
       })
-    });
+    } finally {
+      setLoading(false);
+    }
   }
 
   const Welcome = () => {
@@ -107,7 +123,7 @@ const SignIn = ({ navigation }, props) => {
       />
 
 
-      <TouchableOpacity title="Sign up" style={styles.button} onPress={signIn}>
+      <TouchableOpacity title="Sign In" style={styles.button} onPress={signIn} disabled={loading}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
 
