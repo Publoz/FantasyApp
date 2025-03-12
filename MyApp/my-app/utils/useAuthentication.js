@@ -1,29 +1,12 @@
-import React, { useEffect } from "react";
-//import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { useState } from "react";
+import { Store } from '../redux/store';
 
-const auth = getAuth();
+//TODO: use jwt-decode library to add expiry to the token
+export default function hasAuth() {
+    const token = Store.getState().value;
+    if (token) {
+      return true;
+    }
 
-export function useAuth() {
-  const [user, setUser] = useState(null);
+    return false;
 
-  useEffect(() => {
-   /* const unsubscribeFromAuthStateChanged = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        setUser(user);
-      } else {
-        // User is signed out
-        setUser(undefined);
-      }
-    });
-
-    return unsubscribeFromAuthStateChanged;*/
-    return null;
-  }, []);
-
-  return {
-    user,
-  };
 }

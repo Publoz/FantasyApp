@@ -6,10 +6,13 @@ import fetchClient from '../utils/apiCaller';
 import { setToken } from '../redux/store';
 import { Store } from '../redux/store';
 import { useDispatch } from 'react-redux';
+import { useAuth } from '../navigation/rootNav';
 
 const SignIn = ({ navigation }, props) => {
 
   //const auth = getAuth();
+
+  const { setIsAuthenticated } = useAuth();
 
   const [value, setValue] = useState({
     email: '',
@@ -69,6 +72,8 @@ const SignIn = ({ navigation }, props) => {
 
         fetchClient.get('/dashboard').then(response => {
           console.log(response.data.message);
+          setIsAuthenticated(true);
+          navigation.navigate('SignIn');
         })
           .catch(error => {
             console.log(error.message);

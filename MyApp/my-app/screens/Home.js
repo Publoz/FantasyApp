@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useAuth } from '../navigation/rootNav';
 //import { useAuth } from '../utils/useAuthentication';
 
 
 
 const Home = ({ navigation }, props) => {
   const [componentReady, setComponentReady] = useState(false);
+  const { setIsAuthenticated } = useAuth();
   //const { user } = useAuth();
   //const auth = getAuth();
 
@@ -22,6 +24,10 @@ const Home = ({ navigation }, props) => {
   //   navigation.navigate('Delete');
   // };
 
+  const SignOut = () => {
+    setIsAuthenticated(false);
+  };
+
 
   if (!componentReady) {
     // Return loading state or placeholder component
@@ -34,7 +40,7 @@ const Home = ({ navigation }, props) => {
       <Text style={styles.text}>Welcome /dude/</Text>
 
       <View style={styles.buttons}>
-        <TouchableOpacity  style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={SignOut}>
           <Text style={styles.text}>Sign out</Text>
         </TouchableOpacity>
 
