@@ -5,6 +5,7 @@ import createDatabaseConnection from './database.js';
 import authRouter from './routes/auth.js';
 import teamSelectionRouter from './routes/teamSelection.js';
 import requireAuth from './middlewares/requireAuth.js';
+import users from './routes/users.js';  
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(bodyParser.json());
 // Use auth router
 app.use('/auth', authRouter);
 app.use('/teamSelection', teamSelectionRouter);
+app.use('/users', users);
 
 
 

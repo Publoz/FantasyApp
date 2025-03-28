@@ -1,5 +1,6 @@
 import { createSlice, configureStore } from '@reduxjs/toolkit'
 import teamReducer from './slices/teamSlice';
+import usersCompetitionsReducer from './slices/usersCompetitionSlice';
 
 const tokenSlice = createSlice({
     name: 'token',
@@ -32,5 +33,6 @@ export const Store = configureStore({
     reducer: {
       token: tokenSlice.reducer,
       team: teamReducer,
+      usersCompetitions: usersCompetitionsReducer
     },
   })

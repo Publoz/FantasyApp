@@ -6,17 +6,17 @@ import requireAuth from '../middlewares/requireAuth.js';
 
 const db = createDatabaseConnection();
 
-const query = 'SELECT * FROM vw_FantasySelections WHERE userId = $1 AND roundId = $2';
+const query = 'SELECT * FROM vw_UsersToCompetitions WHERE userId = $1';
 
 
-router.get('/team', requireAuth, async (req, res, next) => {
+router.get('/competitions', requireAuth, async (req, res, next) => {
   
-  console.log("Received team get");
+  console.log("Received competitons get");
   try {
-      const result = await db.query(query, [req.userId, req.query.roundId]);
+      const result = await db.query(query, [req.userId]);
   
       if (result.rowCount == 0) {
-        return res.status(404).json({ "message": "Team Not found" });
+        return res.status(404).json({ "message": "User has no competitions entered" });
       }
 
       res.json(result.rows);

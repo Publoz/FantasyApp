@@ -49,6 +49,11 @@ const Home = ({ navigation }, props) => {
     navigation.navigate('SelectedTeam');
   };
 
+  const NavigateToPlayerSelection = () => {
+    navigation.navigate('PlayerSelect');
+  };
+
+
 
   if (!componentReady) {
     // Return loading state or placeholder component
@@ -64,7 +69,11 @@ const Home = ({ navigation }, props) => {
 
       <TouchableOpacity style={styles.button} onPress={NavigateToTeamSelection}>
           <Text style={styles.text}>My Team this Round</Text>
-        </TouchableOpacity>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={NavigateToPlayerSelection}>
+          <Text style={styles.text}>Players</Text>
+      </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={TestAuth}>
           <Text style={styles.text}>Test Auth</Text>

@@ -6,6 +6,7 @@ import Welcome from '../screens/Welcome';
 import SignIn from '../screens/SignIn';
 import Home from '../screens/Home';
 import SelectedTeam from '../screens/SelectedTeam';
+import PlayerSelect from '../screens/PlayerSelect';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 //import { Root } from 'react-native-popup-confirm-toast';
@@ -32,6 +33,7 @@ export default function MenuStack() {
                         ),
                     }} />
                     <Stack.Screen name="SelectedTeam" component={SelectedTeam} />
+                    <Stack.Screen name="PlayerSelect" component={PlayerSelect} />
 
               
                 {/* <Stack.Screen name="Info"

@@ -35,6 +35,18 @@ const SignIn = ({ navigation }, props) => {
     return true;
   }
 
+  function pause(duration) {
+    return new Promise(resolve => setTimeout(resolve, duration));
+  }
+
+  async function autoFill() {
+    //TODO: remove this
+    setValue((prevValue) => ({ ...prevValue, email: 'publoz123@gmail.com' }));
+    setValue((prevValue) => ({ ...prevValue, password: 'Tester99' }));
+    await pause(500);
+
+  }
+
   async function signIn() {
     if (!verifyInput()) {
       return;
@@ -123,6 +135,9 @@ const SignIn = ({ navigation }, props) => {
 
       {loading && <ActivityIndicator size="large" color="#fe8c19"/>}
 
+      <TouchableOpacity title="AutoFill" style={styles.button} onPress={autoFill} disabled={loading}>
+        <Text style={styles.buttonText}>AutoFill</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity title="Sign In" style={styles.button} onPress={signIn} disabled={loading}>
         <Text style={styles.buttonText}>Sign In</Text>

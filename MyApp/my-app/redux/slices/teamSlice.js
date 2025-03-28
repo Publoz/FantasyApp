@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import fetchClient from '../../utils/apiCaller'
 
-export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (_, { getState }) => {
+export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (roundId, { getState }) => {
   console.log('fetchTeamData thunk');
   const state = getState();
   console.log(state);
@@ -10,7 +10,7 @@ export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (_, { 
     return state.team.teamData;
   }
 
-  const response = await fetchClient.get('/teamSelection/team', {
+  const response = await fetchClient.get(`/teamSelection/team?roundId=${roundId}`, {
     validateStatus: function (status) {
       return status >= 200 && status < 500;
     },
