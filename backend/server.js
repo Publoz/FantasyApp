@@ -6,6 +6,7 @@ import authRouter from './routes/auth.js';
 import teamSelectionRouter from './routes/teamSelection.js';
 import requireAuth from './middlewares/requireAuth.js';
 import users from './routes/users.js';  
+import escapeQueryParams from './middlewares/escapeQueryParams.js';
 
 const app = express();
 
@@ -19,6 +20,10 @@ app.use(bodyParser.json());
 //   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 //   next();
 // });
+
+
+
+app.use(escapeQueryParams);
 
 // Use auth router
 app.use('/auth', authRouter);

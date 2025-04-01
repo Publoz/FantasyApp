@@ -5,7 +5,7 @@ const fetchClient = () => {
   const defaultOptions = {
     baseURL: process.env.REACT_APP_BACKEND,
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
     },
   };
   const instance = axios.create(defaultOptions);

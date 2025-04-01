@@ -39,7 +39,7 @@ const usersCompetitionsSlice = createSlice({
     competitionData: [],
     error: '',
     apiCalled: false,
-    selectedCompetition: null,
+    selectedCompetition: null, //roundId
     roundAlias: null,
   },
   reducers: {

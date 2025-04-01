@@ -1,18 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import fetchClient from '../../utils/apiCaller'
 
-export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (roundId, { getState }) => {
-  console.log('fetchTeamData thunk');
+export const fetchPlayerSelectionData = createAsyncThunk('team/fetchPlayerSelectionData', async (competitionId, { getState }) => {
+  console.log('fetchPlayerSelectionData thunk');
   const state = getState();
-  //console.log(state);
-
-  //TODO: Investigate apiCalled working properly
-  if (state.apiCalled && state.team && state.team.teamData) {
-    console.log('Returning teamData from state ------' );
-    return state.team.teamData;
+ 
+  if (state.apiCalled && state.playerSelection && state.playerSelection.playersData) {
+    return state.playerSelection.playersData;
   }
 
-  const response = await fetchClient.get(`/teamSelection/team?roundId=${roundId}`, {
+  const response = await fetchClient.get(`/teamSelection/players?competitionId=${competitionId}`, {
     validateStatus: function (status) {
       return status >= 200 && status < 500;
     },
@@ -25,29 +22,29 @@ export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (round
   }
 });
 
-const teamSlice = createSlice({
-  name: 'team',
+const playerSelectionSlice = createSlice({
+  name: 'playerSelection',
   initialState: {
     loading: false,
-    teamData: [],
+    playersData: [],
     error: '',
     apiCalled: false
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTeamData.pending, (state) => {
-        console.log('fetchTeamData pending');
+      .addCase(fetchPlayerSelectionData.pending, (state) => {
+        console.log('fetchPlayerSelectionData pending');
         state.loading = true;
       })
-      .addCase(fetchTeamData.fulfilled, (state, action) => {
+      .addCase(fetchPlayerSelectionData.fulfilled, (state, action) => {
         //console.log('fetchTeamData fulfilled', action.payload);
         state.loading = false;
-        state.teamData = action.payload;
+        state.playersData = action.payload;
         state.apiCalled = true;
         state.error = '';
       })
-      .addCase(fetchTeamData.rejected, (state, action) => {
+      .addCase(fetchPlayerSelectionData.rejected, (state, action) => {
        // console.log('fetchTeamData rejected', action.error);
         state.loading = false;
         state.error = action.error.message;
@@ -55,4 +52,4 @@ const teamSlice = createSlice({
   },
 });
 
-export default teamSlice.reducer;
+export default playerSelectionSlice.reducer;

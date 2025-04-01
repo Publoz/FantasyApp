@@ -4,6 +4,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTeamData } from '../redux/slices/teamSlice';
 import { fetchUsersCompetitions, setRoundAlias, setSelectedCompetition } from '../redux/slices/usersCompetitionSlice';
+import getPriceColor from '../utils/getPriceColour';
 //import { useAuth } from '../utils/useAuthentication';
 
 
@@ -70,16 +71,6 @@ const SelectedTeam = ({ navigation }, props) => {
 
   const GoBack = () => {
     navigation.navigate('Home');
-  };
-
-  const getPriceColor = (price) => {
-    if (price >= 30) {
-      return 'red';
-    } else if (price > 15) {
-      return 'orange';
-    } else {
-      return 'green';
-    }
   };
 
   const filterByPosition = (positions) => {
@@ -210,9 +201,15 @@ const styles = StyleSheet.create({
   list: {
     flexGrow: 1,
   },
-  teaminfo: {
-    marginTop: 20,
-    marginLeft: 10
+  teaminfo:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    margin: 12,
+    padding: 8,
+    backgroundColor: '#777777',
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#333333',
   },
 
   text: {
