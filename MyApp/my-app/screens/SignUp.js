@@ -2,10 +2,21 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Input } from '@rneui/base';
 import axios from 'axios';
+import fetchClient from '../utils/apiCaller';
 
 
 
 const SignUp = ({ navigation }, props) => {
+  
+  const [value, setValue] = useState({
+    name: '',
+    email: '',
+    password: '',
+    error: ''
+  })
+
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   //const auth = getAuth();
 
@@ -24,36 +35,55 @@ const SignUp = ({ navigation }, props) => {
     return true;
   }
 
-  const [value, setValue] = useState({
-    name: '',
-    email: '',
-    password: '',
-    error: ''
-  })
 
   async function signUp() {
+    setIsLoading(true);
+    setIsSuccess(false);
+    setValue({
+      ...value,
+      error: ''
+    })
+
     if (!verifyInput()) {
+      setIsLoading(false);
       return;
     }
 
-    //try {
-    await axios.post(process.env.BACKEND + '/auth/signup', {
-      name: value.name,
-      email: value.email,
-      password: value.password
-    }, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }).then(function (response) {
-      console.log(response);
-    })
-      .catch(function (error) {
+    try {
+      const response = await fetchClient.post('/auth/signup', {
+        name: value.name,
+        email: value.email,
+        password: value.password
+      }, {
+        validateStatus: function (status) {
+          return status >= 200 && status < 500; // Resolve only if the status code is less than 500
+        }
+      });
+
+      if (!response.data.message || response.data.error || response.status != 200) {
         setValue({
           ...value,
-          error: error.message,
+          error: "Error: " + response.data.error,
         })
-      });
+        return;
+      } else {
+        console.log('-----VALID SIGNUP----');
+        setIsSuccess(true);
+        console.log(response.data);
+      }
+
+    } catch (error) {
+      setValue({
+        ...value,
+        error: error.message,
+      })
+    } finally {
+      setIsLoading(false);
+    }
+  
+
+    //try {
+ 
     // } catch (error) {
     //   setValue({
     //     ...value,
@@ -74,6 +104,8 @@ const SignUp = ({ navigation }, props) => {
 
 
       {!!value.error && <View style={styles.error}><Text style={styles.error}>{value.error}</Text></View>}
+
+      {isSuccess && <View style={styles.successContainer}><Text style={styles.success}>User Created! Check your email and then sign In</Text></View>}
 
       <Input
         placeholder='Name'
@@ -101,7 +133,7 @@ const SignUp = ({ navigation }, props) => {
         secureTextEntry={true}
       />
 
-      <TouchableOpacity title="Sign up" style={styles.button} onPress={signUp}>
+      <TouchableOpacity title="Sign up" style={styles.button} onPress={signUp} disabled={isLoading}>
         <Text style={styles.buttonText}>Sign Up!</Text>
       </TouchableOpacity>
 
@@ -127,7 +159,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: '50%',
+    width: '85%',
     alignItems: 'center',
   },
 
@@ -154,6 +186,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     fontSize: 30,
     padding: 5
+  },
+  success: {
+    color: '#49bf00',
+    backgroundColor: 'black',
+    textAlign: 'center',
+    fontSize: 30,
+    padding: 5,
+  },
+  successContainer: {
+    color: '#49bf00',
+    backgroundColor: 'black',
+    textAlign: 'center',
+    fontSize: 30,
+    marginBottom:20,
   }
 
 

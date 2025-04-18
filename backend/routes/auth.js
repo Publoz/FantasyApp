@@ -100,7 +100,7 @@ router.post('/signup', (req, res, next) => {
             return res.status(500).send('Password gen failed');
         }
         
-        var params = [req.body.name, req.body.email, hashedPass, salt];
+        var params = [req.body.name, req.body.email.toLowerCase(), hashedPass, salt];
         try {
             const userId = (await db.query(signUpSql, params)).rows[0]['userid'];
             handleSuccessfulSignUp(res, req.body.email, userId);
@@ -109,7 +109,12 @@ router.post('/signup', (req, res, next) => {
             })
     
         } catch (err){
-            res.status(400).json({"error": err.message})
+            console.log("ERROR sign up: " + err.message)
+            if (err.code === '23505' && err.constraint === 'u_email') {
+                return res.status(400).json({ "error": "Email already exists. Please use a different email." });
+            }
+
+            res.status(400).json({ "error": "Error Occurred signing up. Talk to administrator" });
             return;
         }
     });

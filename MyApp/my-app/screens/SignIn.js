@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: '50%',
+    width: '85%',
     alignItems: 'center',
   },
 
