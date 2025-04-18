@@ -10,6 +10,8 @@ const db = createDatabaseConnection();
 const teamSelectionQuery = 'SELECT * FROM vw_FantasySelections WHERE userId = $1 AND roundId = $2';
 const playersQuery = 'SELECT * FROM vw_PlayerSelection WHERE competitionId = $1';
 
+const rulesSelectionQuery = 'SELECT * FROM vw_selectionRules WHERE currentRoundId = $1 LIMIT 1';
+
 //TeamSelection POST queries
 const getPlayersDataQuery = 'SELECT * FROM vw_playerSelectionValidation WHERE playerid = ANY($1::int[]) AND roundid = $2 AND userid = $3';
 const getCompetitionConfigQuery = 'SELECT * FROM vw_competitionConfig WHERE currentRoundId = $1 LIMIT 1';
@@ -99,7 +101,7 @@ router.post('/team', requireAuth,
 
 function checkAmountsMet(configMinimumJSON, configMaximumJSON, playerRows){
   const tally = {
-    goalkeepers: 0,
+    goalkeeper: 0,
     leftwing: 0,
     rightwing: 0,
     pivot: 0,
@@ -161,7 +163,7 @@ function getPlayerCategory(position) {
     case 'pivot':
       return 'middles';
     case 'goalkeeper':
-      return 'goalkeepers';
+      return 'goalkeeper';
     case 'left wing':
     case 'leftwing':
     case 'right wing':
@@ -172,14 +174,41 @@ function getPlayerCategory(position) {
   }
 }
 
-router.get('/players', async (req, res, next) => {
+router.get('/players', 
+  query('competitionId')
+    .notEmpty().withMessage('Competition ID must be supplied')
+    .isInt().withMessage('Competition ID must be an integer'),
+  async (req, res, next) => {
 
   console.log("Received players get");
   try {
     const result = await db.query(playersQuery, [req.query.competitionId]);
 
     if (result.rowCount == 0) {
-      return res.status(404).json({ "message": "Comp Not found or has no players" });
+      return res.status(404).json({ "message": "Comp not found or has no players" });
+    }
+
+    res.json(result.rows);
+
+
+  } catch (err) {
+    console.error('Database query error', err);
+    res.status(500).json({ "error": err.message });
+  }
+});
+
+router.get('/selectionRules', 
+  query('roundId')
+    .notEmpty().withMessage('Round ID must be supplied')
+    .isInt().withMessage('Round ID must be an integer'),
+  async (req, res, next) => {
+
+  console.log("Received selection rules get");
+  try {
+    const result = await db.query(rulesSelectionQuery, [req.query.roundId]);
+
+    if (result.rowCount == 0) {
+      return res.status(404).json({ "message": "Comp not found or has no rules" });
     }
 
     res.json(result.rows);

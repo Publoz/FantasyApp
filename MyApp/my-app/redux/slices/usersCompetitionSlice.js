@@ -5,7 +5,7 @@ export const fetchUsersCompetitions = createAsyncThunk('users/competitions', asy
   console.log('users competition thunk');
   const state = getState().usersCompetitions;
 
-  if (state.apiCalled && state.usersCompetitions && state.usersCompetitions.competitionData) {
+  if (state && state.apiCalled && state.competitionData) {
     console.log('return comp data stored');
     return state.usersCompetitions.competitionData;
   }

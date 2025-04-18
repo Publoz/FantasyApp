@@ -20,4 +20,28 @@ const getPositionPrefix = (position) => {
   }
 };
 
+export const getPlayerCategory = (position) => {
+  switch (position.toLowerCase()) {
+    case 'left back':
+    case 'leftback':
+    case 'right back':
+    case 'rightback':
+      return 'backs';
+    case 'centre back':
+    case 'centreback':
+    case 'pivot':
+      return 'middles';
+    case 'goalkeeper':
+      return 'goalkeeper';
+    case 'left wing':
+    case 'leftwing':
+    case 'right wing':
+    case 'rightwing':
+      return 'wings';
+    default:
+      throw new Error('Invalid position');
+  }
+}
+
+
 export default getPositionPrefix;

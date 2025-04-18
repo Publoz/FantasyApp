@@ -5,7 +5,7 @@ export const fetchPlayerSelectionData = createAsyncThunk('team/fetchPlayerSelect
   console.log('fetchPlayerSelectionData thunk');
   const state = getState();
  
-  if (state.apiCalled && state.playerSelection && state.playerSelection.playersData) {
+  if (state.playerSelection && state.playerSelection.apiCalled && state.playerSelection.competitionId === competitionId && state.playerSelection.playersData) {
     return state.playerSelection.playersData;
   }
 
@@ -16,9 +16,9 @@ export const fetchPlayerSelectionData = createAsyncThunk('team/fetchPlayerSelect
   });
 
   if (response.data && response.data.length > 0) {
-    return response.data;
+    return { data: response.data, competitionId };
   } else {
-    return [];
+    return { data: [], competitionId };
   }
 });
 
@@ -27,6 +27,7 @@ const playerSelectionSlice = createSlice({
   initialState: {
     loading: false,
     playersData: [],
+    competitionId: null,
     error: '',
     apiCalled: false
   },
@@ -40,7 +41,8 @@ const playerSelectionSlice = createSlice({
       .addCase(fetchPlayerSelectionData.fulfilled, (state, action) => {
         //console.log('fetchTeamData fulfilled', action.payload);
         state.loading = false;
-        state.playersData = action.payload;
+        state.playersData = action.payload.data;
+        state.competitionId = action.payload.competitionId;
         state.apiCalled = true;
         state.error = '';
       })

@@ -7,7 +7,7 @@ export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (round
   //console.log(state);
 
   //TODO: Investigate apiCalled working properly
-  if (state.apiCalled && state.team && state.team.teamData) {
+  if (state.team && state.team.apiCalled && state.team.teamData && state.team.roundId === roundId) {
     console.log('Returning teamData from state ------' );
     return state.team.teamData;
   }
@@ -19,7 +19,7 @@ export const fetchTeamData = createAsyncThunk('team/fetchTeamData', async (round
   });
 
   if (response.data && response.data.length > 0) {
-    return response.data;
+    return {data: response.data, roundId};
   } else {
     return [];
   }
@@ -30,10 +30,13 @@ const teamSlice = createSlice({
   initialState: {
     loading: false,
     teamData: [],
+    roundId: null,
     error: '',
-    apiCalled: false
+    apiCalled: false,
   },
-  reducers: {},
+  reducers: {setTeamData: (state, action) => {
+    state.teamData = action.payload;
+  }},
   extraReducers: (builder) => {
     builder
       .addCase(fetchTeamData.pending, (state) => {
@@ -43,7 +46,8 @@ const teamSlice = createSlice({
       .addCase(fetchTeamData.fulfilled, (state, action) => {
         //console.log('fetchTeamData fulfilled', action.payload);
         state.loading = false;
-        state.teamData = action.payload;
+        state.teamData = action.payload.data;
+        state.roundId = action.payload.roundId;
         state.apiCalled = true;
         state.error = '';
       })
@@ -55,4 +59,5 @@ const teamSlice = createSlice({
   },
 });
 
+export const { setTeamData } = teamSlice.actions;
 export default teamSlice.reducer;
